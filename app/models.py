@@ -112,6 +112,11 @@ def load_user(id):
     return db.session.get(User, int(id))
 
 
+post_users = db.Table('post_users',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True)
+)
+
 class Post(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     title: so.Mapped[str] = so.mapped_column(sa.String(140))
@@ -119,10 +124,10 @@ class Post(db.Model):
     progress: so.Mapped[int] = so.mapped_column()
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id),
-                                               index=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
 
     author: so.Mapped[User] = so.relationship(back_populates='posts')
+    users = db.relationship('User', secondary=post_users, backref='tagged_posts')
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return f'<Post {self.body}>'

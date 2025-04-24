@@ -32,6 +32,13 @@
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}
+    <h3>Joined Posts</h3>
+    {% for post in joined_posts %}
+        {% include '_post.html' %}
+    {% else %}
+        <p>No joined posts yet.</p>
+    {% endfor %}
+
     <nav aria-label="Post navigation">
         <ul class="pagination">
             <li class="page-item{% if not prev_url %} disabled{% endif %}">
