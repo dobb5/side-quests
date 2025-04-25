@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
+# ← add this import
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     TextAreaField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
-    Length, NumberRange
+    Length, NumberRange, Optional
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -51,6 +53,11 @@ class ResetPasswordForm(FlaskForm):
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    # ← NEW field for profile picture
+    picture = FileField(
+        'Update Profile Picture',
+        validators=[FileAllowed(['jpg', 'jpeg', 'png']), Optional()]
+    )
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):
@@ -72,11 +79,34 @@ class EmptyForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[
         DataRequired(), Length(max=140)])
-    
+
     body = TextAreaField('Body', validators=[
         DataRequired(), Length(min=1, max=140)])
-    
+
     progress = IntegerField('Progress', validators=[
         DataRequired(), NumberRange(min=0, max=100)])
-    
+
+    picture = FileField('Upload Image', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
+
     submit = SubmitField('Submit')
+
+
+# ← NEW form for quest creation, with image upload
+class QuestForm(FlaskForm):
+    title = StringField('Title', validators=[
+        DataRequired(), Length(max=140)])
+
+    body = TextAreaField('Body', validators=[
+        DataRequired(), Length(min=1, max=140)])
+
+    progress = IntegerField('Progress', validators=[
+        DataRequired(), NumberRange(min=0, max=100)])
+
+    image = FileField(
+        'Quest Image',
+        validators=[FileAllowed(['jpg', 'jpeg', 'png']), Optional()]
+    )
+
+    submit = SubmitField('Create Quest')
