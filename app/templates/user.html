@@ -6,7 +6,7 @@
       <td width="256px">
         <img
           src="{{ url_for('static',
-                          filename='uploads/profile_pics/' ~ user.profile_pic) }}"
+                          filename='uploads/' ~ user.profile_pic) }}"
           alt="Profile pic of {{ user.username }}"
           class="img-thumbnail"
         >

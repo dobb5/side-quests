@@ -86,11 +86,17 @@ class PostForm(FlaskForm):
     progress = IntegerField('Progress', validators=[
         DataRequired(), NumberRange(min=0, max=100)])
 
-    picture = FileField('Upload Image', validators=[
+    image = FileField('Upload Image', validators=[
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
 
     submit = SubmitField('Submit')
+
+class UploadImageForm(FlaskForm):
+    image = FileField('Upload Image', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
+    ])
+    submit = SubmitField('Upload Image')
 
 
 # ← NEW form for quest creation, with image upload

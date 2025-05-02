@@ -9,8 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import app, db, login
 
-
-# association table for followers
+# Association table for followers
 followers = sa.Table(
     'followers',
     db.metadata,
@@ -18,6 +17,21 @@ followers = sa.Table(
     sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
 )
 
+# Association table for quest participants
+quest_participants = db.Table(
+    'quest_participants',
+    db.metadata,
+    sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('quest_id', sa.Integer, sa.ForeignKey('quest.id'), primary_key=True)
+)
+
+# Association table for post participants (e.g., tagged users)
+post_users = db.Table(
+    'post_users',
+    db.metadata,
+    sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('post_id', sa.Integer, sa.ForeignKey('post.id'), primary_key=True)
+)
 
 class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -25,16 +39,16 @@ class User(UserMixin, db.Model):
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
-    last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
-        default=lambda: datetime.now(timezone.utc)
-    )
+    last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(default=lambda: datetime.now(timezone.utc))
 
-    # NEW: stores filename under static/uploads/profile_pics/
     profile_pic: so.Mapped[str] = so.mapped_column(
         sa.String(128), nullable=False, default='default.jpg'
     )
 
     posts: so.WriteOnlyMapped['Post'] = so.relationship(back_populates='author')
+    created_quests: so.WriteOnlyMapped['Quest'] = so.relationship(back_populates='creator')
+    joined_quests = db.relationship('Quest', secondary=quest_participants, back_populates='participants')
+
     following: so.WriteOnlyMapped['User'] = so.relationship(
         secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -74,15 +88,11 @@ class User(UserMixin, db.Model):
         return db.session.scalar(query) is not None
 
     def followers_count(self):
-        query = sa.select(sa.func.count()).select_from(
-            self.followers.select().subquery()
-        )
+        query = sa.select(sa.func.count()).select_from(self.followers.select().subquery())
         return db.session.scalar(query)
 
     def following_count(self):
-        query = sa.select(sa.func.count()).select_from(
-            self.following.select().subquery()
-        )
+        query = sa.select(sa.func.count()).select_from(self.following.select().subquery())
         return db.session.scalar(query)
 
     def following_posts(self):
@@ -92,10 +102,7 @@ class User(UserMixin, db.Model):
             sa.select(Post)
             .join(Post.author.of_type(Author))
             .join(Author.followers.of_type(Follower), isouter=True)
-            .where(sa.or_(
-                Follower.id == self.id,
-                Author.id == self.id,
-            ))
+            .where(sa.or_(Follower.id == self.id, Author.id == self.id))
             .group_by(Post)
             .order_by(Post.timestamp.desc())
         )
@@ -109,8 +116,7 @@ class User(UserMixin, db.Model):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['reset_password']
+            id = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
         except Exception:
             return
         return db.session.get(User, id)
@@ -119,14 +125,6 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
-
-
-# association table for post participants (e.g., joined quests)
-post_users = db.Table(
-    'post_users',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True)
-)
 
 
 class Post(db.Model):
@@ -142,10 +140,27 @@ class Post(db.Model):
     author: so.Mapped[User] = so.relationship(back_populates='posts')
     users = db.relationship('User', secondary=post_users, backref='tagged_posts')
 
-    # NEW: stores filename under static/uploads/quest_pics/
-    image_file: so.Mapped[Optional[str]] = so.mapped_column(
-        sa.String(128), nullable=True
-    )
+    image_file: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128), nullable=True)
 
     def __repr__(self):
         return f'<Post {self.body}>'
+
+
+class Quest(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    title: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=False)
+    description: so.Mapped[Optional[str]] = so.mapped_column(sa.String(500))
+    created_at: so.Mapped[datetime] = so.mapped_column(
+        default=lambda: datetime.now(timezone.utc), index=True
+    )
+    deadline: so.Mapped[Optional[datetime]] = so.mapped_column(nullable=True)
+    progress: so.Mapped[int] = so.mapped_column(default=0)
+    creator_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), nullable=False)
+
+    creator: so.Mapped[User] = so.relationship(back_populates='created_quests')
+    participants = db.relationship('User', secondary=quest_participants, back_populates='joined_quests')
+
+    image_file: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128), nullable=True)
+
+    def __repr__(self):
+        return f'<Quest {self.title}>'

@@ -1,8 +1,18 @@
-
 import os
 import secrets
 from PIL import Image
 from flask import current_app
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def delete_old_image(image_path):
+    if image_path:
+        full_path = os.path.join(current_app.root_path, 'static', 'uploads', image_path)
+        if os.path.exists(full_path):
+            os.remove(full_path)
 
 def save_image(form_image, folder, size=(200, 200)):
     # generate random filename
@@ -11,10 +21,7 @@ def save_image(form_image, folder, size=(200, 200)):
     filename = random_hex + f_ext
 
     # ensure upload folder exists
-    upload_dir = os.path.join(
-        current_app.root_path,
-        'static', 'uploads', folder
-    )
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', folder)
     os.makedirs(upload_dir, exist_ok=True)
 
     # resize & save

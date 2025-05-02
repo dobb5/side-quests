@@ -14,7 +14,7 @@
       {% if post.image_file %}
         <img
           src="{{ url_for('static',
-                          filename='uploads/post_pics/' ~ post.image_file) }}"
+                          filename='uploads/' ~ post.image_file) }}"
           alt="Image for {{ post.title }}"
           class="img-fluid mb-2"
         >

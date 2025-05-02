@@ -6,12 +6,12 @@ import sqlalchemy as sa
 from app import app, db
 from app.forms import (
     LoginForm, RegistrationForm, EditProfileForm,
-    EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm
+    EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, UploadImageForm
 )
-from app.models import User, Post, post_users
+from app.models import User, Post, Quest, post_users
 from app.email import send_password_reset_email
 
-from app.utils import save_image
+from app.utils import save_image, allowed_file, delete_old_image
 
 
 @app.before_request
@@ -269,3 +269,74 @@ def join_post(post_id):
         db.session.commit()
         flash('You joined the post!')
     return redirect(request.referrer or url_for('index'))
+
+
+# Route to upload an image for a quest
+@app.route('/upload_quest_image/<int:quest_id>', methods=['GET', 'POST'])
+@login_required
+def upload_quest_image(quest_id):
+    quest = Quest.query.get_or_404(quest_id)
+    if quest.creator != current_user:
+        flash('You are not authorized to upload an image for this quest.')
+        return redirect(url_for('index'))
+
+    form = UploadImageForm()
+    if form.validate_on_submit():
+        # Handle uploaded image for the quest
+        image_path = save_image(form.image.data, folder='quest_pics', size=(400, 400))
+        quest.image_file = image_path
+        db.session.commit()
+        flash('Quest image uploaded successfully!')
+        return redirect(url_for('quest_detail', quest_id=quest.id))  # Assuming there's a quest detail route
+
+    return render_template('upload_image.html', title='Upload Quest Image', form=form)
+
+
+# Route to upload or update profile picture
+@app.route('/upload_profile_image', methods=['GET', 'POST'])
+@login_required
+def upload_profile_image():
+    form = UploadImageForm()
+    if form.validate_on_submit():
+        if not allowed_file(form.image.data.filename):
+            flash('Unsupported file type. Please upload PNG, JPG, or GIF.')
+            return redirect(request.url)
+
+        # Delete old profile picture
+        delete_old_image(current_user.profile_pic)
+
+        # Save new image
+        image_path = save_image(form.image.data, folder='profile_pics', size=(256, 256))
+        current_user.profile_pic = image_path
+        db.session.commit()
+        flash('Your profile picture has been updated!')
+        return redirect(url_for('edit_profile'))
+
+    return render_template('upload_image.html', title='Upload Profile Image', form=form)
+
+# Route to upload an image for any generic post (not directly related to profile or quests)
+@app.route('/upload_post_image/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def upload_post_image(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        flash('You are not authorized to upload an image for this post.')
+        return redirect(url_for('index'))
+
+    form = UploadImageForm()
+    if form.validate_on_submit():
+        if not allowed_file(form.image.data.filename):
+            flash('Unsupported file type. Please upload PNG, JPG, or GIF.')
+            return redirect(request.url)
+
+        # Delete old post image
+        delete_old_image(post.image_file)
+
+        # Save new image
+        image_path = save_image(form.image.data, folder='post_pics', size=(400, 400))
+        post.image_file = image_path
+        db.session.commit()
+        flash('Post image uploaded successfully!')
+        return redirect(url_for('post_detail', post_id=post.id))
+
+    return render_template('upload_image.html', title='Upload Post Image', form=form)
