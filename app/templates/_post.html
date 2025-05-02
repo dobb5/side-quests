@@ -1,35 +1,43 @@
 <table class="table table-hover">
-    <tr>
-        <td width="70px">
-            <a href="{{ url_for('user', username=post.author.username) }}">
-                <img src="{{ post.author.avatar(70) }}" />
-            </a>
-        </td>
-        <td>
-            <a href="{{ url_for('user', username=post.author.username) }}">
-                {{ post.author.username }}
-            </a>
-            says:
-            <br>
-            <strong>{{ post.title }}</strong><br>
-            {{ post.body }}<br>
+  <tr>
+    <td width="70px">
+      <a href="{{ url_for('user', username=post.author.username) }}">
+        <img src="{{ post.author.avatar(70) }}" />
+      </a>
+    </td>
+    <td>
+      <a href="{{ url_for('user', username=post.author.username) }}">
+        {{ post.author.username }}
+      </a>
+      says:
+      <br>
+      {% if post.image_file %}
+        <img
+          src="{{ url_for('static',
+                          filename='uploads/' ~ post.image_file) }}"
+          alt="Image for {{ post.title }}"
+          class="img-fluid mb-2"
+        >
+      {% endif %}
+      <strong>{{ post.title }}</strong><br>
+      {{ post.body }}<br>
 
-            {% if current_user != post.author and current_user not in post.users %}
-                <form method="post" action="{{ url_for('join_post', post_id=post.id) }}">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Join</button>
-                </form>
-            {% endif %}
+      {% if current_user != post.author and current_user not in post.users %}
+        <form method="post" action="{{ url_for('join_post', post_id=post.id) }}">
+          <button type="submit" class="btn btn-sm btn-outline-primary">Join</button>
+        </form>
+      {% endif %}
 
-            {% if post.progress is not none %}
-                <div class="progress mt-2" style="height: 20px;">
-                    <div class="progress-bar" role="progressbar" 
-                         style="width: {{ post.progress }}%;" 
-                         aria-valuenow="{{ post.progress }}" 
-                         aria-valuemin="0" aria-valuemax="100">
-                        {{ post.progress }}%
-                    </div>
-                </div>
-            {% endif %}
-        </td>
-    </tr>
+      {% if post.progress is not none %}
+        <div class="progress mt-2" style="height: 20px;">
+          <div class="progress-bar" role="progressbar"
+               style="width: {{ post.progress }}%;"
+               aria-valuenow="{{ post.progress }}"
+               aria-valuemin="0" aria-valuemax="100">
+            {{ post.progress }}%
+          </div>
+        </div>
+      {% endif %}
+    </td>
+  </tr>
 </table>
