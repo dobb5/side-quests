@@ -36,7 +36,7 @@ def index():
 
     return render_template(
         'index.html', title='Home',
-        posts=posts.items, next_url=next_url, prev_url=prev_url
+        posts=posts.items, now=datetime.utcnow(), next_url=next_url, prev_url=prev_url
     )
 
 
@@ -48,7 +48,7 @@ def create():
         post = Post(
             title=form.title.data,
             body=form.body.data,
-            progress=form.progress.data,
+            due_date=form.due_date.data,
             author=current_user
         )
         # handle uploaded image
@@ -80,7 +80,7 @@ def explore():
         if posts.has_prev else None
     return render_template(
         'index.html', title='Explore',
-        posts=posts.items, next_url=next_url, prev_url=prev_url
+        posts=posts.items, now=datetime.utcnow(),  next_url=next_url, prev_url=prev_url
     )
 
 
@@ -184,7 +184,7 @@ def user(username):
         if posts.has_prev else None
     form = EmptyForm()
     return render_template(
-        'user.html', user=user, posts=posts.items,
+        'user.html', user=user, posts=posts.items, now=datetime.utcnow(),
         next_url=next_url, prev_url=prev_url,
         form=form, joined_posts=joined_posts
     )

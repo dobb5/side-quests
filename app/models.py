@@ -131,7 +131,6 @@ class Post(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     title: so.Mapped[str] = so.mapped_column(sa.String(140))
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
-    progress: so.Mapped[int] = so.mapped_column()
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc)
     )
@@ -141,6 +140,7 @@ class Post(db.Model):
     users = db.relationship('User', secondary=post_users, backref='tagged_posts')
 
     image_file: so.Mapped[Optional[str]] = so.mapped_column(sa.String(128), nullable=True)
+    due_date = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return f'<Post {self.body}>'

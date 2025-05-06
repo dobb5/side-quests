@@ -13,8 +13,7 @@
       <br>
       {% if post.image_file %}
         <img
-          src="{{ url_for('static',
-                          filename='uploads/' ~ post.image_file) }}"
+          src="{{ url_for('static', filename='uploads/' ~ post.image_file) }}"
           alt="Image for {{ post.title }}"
           class="img-fluid mb-2"
         >
@@ -28,15 +27,24 @@
         </form>
       {% endif %}
 
-      {% if post.progress is not none %}
+      {% if post.due_date and post.timestamp %}
+        {% set total_seconds = (post.due_date - post.timestamp).total_seconds() %}
+        {% set elapsed_seconds = (now - post.timestamp).total_seconds() %}
+        {% set percent = ((elapsed_seconds / total_seconds) * 100) if total_seconds > 0 else 100 %}
+        {% if percent < 0 %}
+          {% set percent = 0 %}
+        {% elif percent > 100 %}
+          {% set percent = 100 %}
+        {% endif %}
         <div class="progress mt-2" style="height: 20px;">
           <div class="progress-bar" role="progressbar"
-               style="width: {{ post.progress }}%;"
-               aria-valuenow="{{ post.progress }}"
-               aria-valuemin="0" aria-valuemax="100">
-            {{ post.progress }}%
+              style="width: {{ percent | round(1) }}%;"
+              aria-valuenow="{{ percent | round(0) }}"
+              aria-valuemin="0" aria-valuemax="100">
+            {{ percent | round(1) }}%
           </div>
         </div>
+        <small class="text-muted">Due: {{ post.due_date.strftime('%Y-%m-%d %H:%M') }}</small>
       {% endif %}
     </td>
   </tr>

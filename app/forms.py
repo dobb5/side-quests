@@ -7,6 +7,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
     Length, NumberRange, Optional
 import sqlalchemy as sa
 from app import db
+from wtforms.fields import DateTimeLocalField
 from app.models import User
 
 
@@ -83,12 +84,10 @@ class PostForm(FlaskForm):
     body = TextAreaField('Body', validators=[
         DataRequired(), Length(min=1, max=140)])
 
-    progress = IntegerField('Progress', validators=[
-        DataRequired(), NumberRange(min=0, max=100)])
-
     image = FileField('Upload Image', validators=[
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
+    due_date = DateTimeLocalField('Due Date', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
 
     submit = SubmitField('Submit')
 
