@@ -1,0 +1,74 @@
+  <style>
+  body {
+    background-color: #121212;
+    color: #f8f9fa;
+  }
+.post-wrapper {
+  background-color: #1e1e1e;
+  border: 2px solid #c084fc !important; 
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
+}
+
+
+  /* Links */
+  a {
+    color: #c084fc;
+  }
+
+  a:hover {
+    color: #d8b4fe;
+  }
+
+  /* Bootstrap Cards */
+  .card {
+    background-color: #1e1e1e;
+    border: 1px solid #c084fc;
+    color: #f8f9fa;
+  }
+
+  /* Tables */
+  table {
+    color: #f8f9fa;
+  }
+
+  th,
+  td {
+    background-color: #1e1e1e;
+    border-color: #2c2c2c;
+  }
+
+  /* Forms */
+  input,
+  select,
+  textarea {
+    background-color: #1e1e1e;
+    color: #f8f9fa;
+    border: 1px solid #c084fc;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #aaa;
+  }
+
+  /* Bootstrap Alerts */
+  .alert {
+    background-color: #1f1f1f;
+    color: #f8f9fa;
+    border-left: 5px solid #c084fc;
+  }
+
+  /* Buttons (optional override) */
+  .btn-primary {
+    background-color: #a855f7;
+    border-color: #9333ea;
+  }
+
+  .btn-primary:hover {
+    background-color: #9333ea;
+    border-color: #7e22ce;
+  }
+</style>

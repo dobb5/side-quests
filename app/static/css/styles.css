@@ -1,0 +1,91 @@
+
+/* styles.css */
+body {
+    background-color: #121212;
+    color: #f8f9fa;
+}
+.progress-bar {
+  background-color: #c084fc; /* Purple color */
+}
+
+/* In your styles.css */
+.profile-container {
+  background-color: #1e1e1e; /* Dark background for the profile */
+  color: #fff; /* Text color for better contrast */
+}
+
+.profile-container table {
+  background-color: #1e1e1e; /* Ensure the table background is also dark */
+  color: #fff; /* Ensure table text is white for contrast */
+}
+
+/* Dark background and text for table */
+.table-hover {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+/* Hover effect for rows */
+.table-hover tbody tr:hover {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Optional: darken table borders */
+.table-hover td,
+.table-hover th {
+  border-color: #444444;
+}
+
+/* Make entire tbody dark themed */
+.table-hover tbody {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+/* Hover effect for rows inside tbody */
+.table-hover tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* Optional: make sure borders blend in dark mode */
+.table-hover tbody td,
+.table-hover thead th {
+  border-color: #444444;
+}
+
+.progress {
+  border: 1px solid #c084fc; /* Optional purple border */
+}
+
+.post-wrapper {
+  background-color: #1e1e1e; /* Dark background for posts */
+  border: 2px solid #c084fc; /* Purple border */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
+}
+
+.post-wrapper table {
+  width: 100%;
+  color: #f8f9fa; /* Light text color inside the post */
+}
+
+.post-wrapper td {
+  background-color: #1e1e1e; /* Ensure table cells have the same background */
+  color: #f8f9fa; /* Light text color in table cells */
+}
+
+.post-wrapper img {
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-wrapper a {
+  color: #c084fc; /* Purple links */
+}
+
+.post-wrapper a:hover {
+  color: #d8b4fe; /* Lighter purple on hover */
+}
