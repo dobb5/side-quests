@@ -22,13 +22,13 @@ body {
 /* Dark background and text for table */
 .table-hover {
   background-color: #1e1e1e;
-  color: #ffffff;
+  color: #1e1e1e;
 }
 
 /* Hover effect for rows */
 .table-hover tbody tr:hover {
   background-color: #2a2a2a;
-  color: #ffffff;
+  color: #1e1e1e;
 }
 
 /* Optional: darken table borders */
@@ -40,7 +40,7 @@ body {
 /* Make entire tbody dark themed */
 .table-hover tbody {
   background-color: #1e1e1e;
-  color: #ffffff;
+  color: #1e1e1e;
 }
 
 /* Hover effect for rows inside tbody */
